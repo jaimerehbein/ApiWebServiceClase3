@@ -138,7 +138,29 @@ INNER JOIN usuarios on usuarios.id = registrousuario.idUsuario
     y un codigo http que puede ser 200: exitoso, 201: recurso creado. 500: error.
 
 
+19) Al principio de la clase, nos propusimo hacer un api del tipo rest que soporte 
+    CRUD (CREATE, REMOVE, UPDATE, DELETE) sobre tres entidades.
+    
+usuarios
+encuentros
+registrousuarios
 
+GET /usuarios  Esto nos da todos los usuarios
+GET /usuarios?nombre="n" nos va a dar los usuarios filtrados por nombre
+GET /usuarios/:id nos va a dar un usuario que tenga ese id.
+POST /usuarios
+      { "id": "cf78af5d-d116-47c4-9973-32d246073a50", "nombre":"Juan", "apellido":"Luna"}
+PUT /usuarios/:id
+      {nombre:'', apellido:'' }
+DELETE /usuarios/:id
+
+
+encuentros
+   GET va a retornar todos los encuentros, pero con los usuarios registrados
+   {"idEncuentro": "b5db5fe3-da15-4cae-bee5-9c0ed76cc1f3", "idUsuario": "37d01fc3-5553-4bed-9d4e-8db17e089572"}
+
+registrousuario
+   GET va retornar todos los usuarios y a que encuentro estan registrados
 
 
    
