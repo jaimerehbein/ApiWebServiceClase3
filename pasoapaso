@@ -1,0 +1,145 @@
+1) XAMP ultima version
+2) https://getcomposer.org/ (instalar la version de windows)
+3) composer global require laravel/installer
+4) entramos en la carpeta xamp/htdocs y ahi ejecutamos 
+      composer create-project --prefer-dist laravel/laravel eventos
+5) para testear que todo esta bien localhost:8080/eventos/server.php (aca vemos la home de laravel)
+6) entrar a la carpeta xampp/htdocs/eventos desde esa carpeta
+      creamos 3 controllers
+      php artisan make:controller EventoController --resource
+      php artisan make:controller UsuarioController --resource
+      php artisan make:controller RegistroUsuarioController --resource
+      
+      estos controllers los voy a ver en xampp/htdocs/eventos/app/http/Controllers
+      
+7) vamos al archivo eventos/routes/web.php
+
+   lo que voy a hacer es: agrupar las api y declarar los controllers.
+   
+   Route::group(["prefix" => "apis"], function() {
+      Route::resource('/usuario', 'UsuarioController', [
+        "except" => ["edit"]
+      ]);
+      Route::resource('/encuentro', 'EncuentroController', [
+        "except" => []
+      ]);
+      Route::resource('/registrousuario', 'RegisroUsuarioController', [
+        "except" => ["edit"]
+      ]);
+});
+
+8) Si se acuerdan, que al principio de la clase no funcionaba el post, hay que hacer esta salvedad.
+   app/http/kernel y comentar la linea: // \App\Http\Middleware\VerifyCsrfToken::class,
+   
+9) Bajar el postman o usar curl si tienen linux.
+
+10) Base de datos. la tabla eventos
+
+CREATE TABLE `eventos`.`usuarios` ( 
+    `id` VARCHAR(36) NOT NULL , 
+    `nombre` VARCHAR(50) NOT NULL , 
+    `apellido` VARCHAR(50) NOT NULL ) 
+ENGINE = InnoDB;
+
+CREATE TABLE `eventos`.`encuentros` ( 
+    `id` VARCHAR(36) NOT NULL , 
+    `fecha` DATE NOT NULL , 
+    `nombre` VARCHAR(50) NOT NULL ) 
+ENGINE = InnoDB;
+
+CREATE TABLE `eventos`.`registrousuario` ( 
+    `idusuario` VARCHAR(36) NOT NULL , 
+    `idencuentro` VARCHAR(36) NOT NULL ) 
+ENGINE = InnoDB;
+
+------------------------------------------
+
+insert usuarios (id, nombre, apellido) 
+values ('bafa360c-4376-11e9-88fa-64006afe4f1e', 'Cesar', 'Segovia');
+
+insert usuarios (id, nombre, apellido) 
+value ('c1bd0ce4-4376-11e9-88fa-64006afe4f1e', 'Sabrina', 'Alvarez');
+
+insert usuarios (id, nombre, apellido) 
+value ('c717468c-4376-11e9-88fa-64006afe4f1e', 'Africa', 'Sacin');
+
+------------------------------------------
+
+insert encuentros (id, fecha, nombre)
+values ('12bbc8f0-e26a-4820-a12c-b9734fb0351a', '20190320', 'Filosofia de heidegger');
+
+insert encuentros (id, fecha, nombre)
+values ('b5db5fe3-da15-4cae-bee5-9c0ed76cc1f3', '20190322', 'c# beginner');
+
+insert encuentros (id, fecha, nombre)
+values ('33d9311b-a192-44f1-82ef-dd59f7bb08f4', '20190324', 'Api web Services');
+
+------------------------------------------
+
+insert registrousuario (idusuario, idencuentro)
+values ('c1bd0ce4-4376-11e9-88fa-64006afe4f1e', 'b5db5fe3-da15-4cae-bee5-9c0ed76cc1f3');
+
+insert registrousuario (idusuario, idencuentro)
+values ('c1bd0ce4-4376-11e9-88fa-64006afe4f1e', '33d9311b-a192-44f1-82ef-dd59f7bb08f4');
+
+insert registrousuario (idusuario, idencuentro)
+values ('c1bd0ce4-4376-11e9-88fa-64006afe4f1e', '12bbc8f0-e26a-4820-a12c-b9734fb0351a');
+
+------------------------------------------
+
+SELECT usuarios.nombre, usuarios.apellido, encuentros.nombre, encuentros.fecha
+FROM registrousuario
+INNER JOIN encuentros on encuentros.id = registrousuario.idencuentro
+INNER JOIN usuarios on usuarios.id = registrousuario.idUsuario 
+
+11) Arrancar con las pruebas con postman.
+   a) GET recurso
+      GET recurso/id
+      POST para crear un recurso
+      PUT recurso/id
+      DELETE recurso/id
+      
+12) Armarse un utilitario como para acceder a mySQL.
+
+    class mySQLutil {
+      public function getConnection() {
+          $sqlconn = new MySQLi("localhost","root","","encuentros");
+          return $sqlconn;
+      }
+    public function insert($sqlTxt) {
+        $conn = $this->getConnection();
+        $resultset = $conn->query($sqlTxt);
+        var_dump($resultset);
+        $conn->close();
+      }
+    }
+    
+13) prubar el utilitario desde la linea de comando.
+
+14) armar el SQL y contestarlo como texto como para luego insertarlo en mysql y verificar que funcion bien.
+
+15) en Store que corresponde al post, laravel me pasa Request $request
+    tengo que utilizar $request->input para acceder a cada parametro de entrada.
+    
+16) Siempre que hago post, tengo que poner un header que es: Content-Type: application/json.
+
+17) En la funcion index la puedo sobrecargar de esta forma   function index(Request $request)
+    en el request puedo acceder a una key que me pasa el usuario ej:
+    $request->query
+    GET /recurso?nombre="alberto"
+
+18) El response de todos los metodos se realiza de la siguiente manera:
+    return response()->json([], CODIGO_HTTP);
+
+    un array asociativo 
+    ["nombre" => "jorge"],
+    ["apellido" =>"andrada"]
+    
+    y un codigo http que puede ser 200: exitoso, 201: recurso creado. 500: error.
+
+
+
+
+
+   
+
